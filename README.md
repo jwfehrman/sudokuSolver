@@ -1,2 +1,2 @@
 # sudokuSolver
-Sudoku Solver created with node.js and react.js
+Sudoku Solver created in Java with a UI
