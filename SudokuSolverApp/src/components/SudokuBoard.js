@@ -5,14 +5,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
-  Alert,
 } from 'react-native';
 
 const SudokuBoard = () => {
   const [board, setBoard] = useState(Array(9).fill().map(() => Array(9).fill('')));
 
   const handleCellChange = (rowIndex, colIndex, value) => {
-    if (value === '' || (parseInt(value) >= 1 && parseInt(value) <= 9)) {
+    if (value === '' || (value >= '1' && value <= '9')) {
       const newBoard = [...board];
       newBoard[rowIndex][colIndex] = value;
       setBoard(newBoard);
@@ -26,19 +25,17 @@ const SudokuBoard = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          board: board.map(row => row.map(cell => cell === '' ? 0 : parseInt(cell))),
-        }),
+        body: JSON.stringify({ board }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to solve Sudoku');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.board) {
+          setBoard(data.board);
+        }
       }
-
-      const solution = await response.json();
-      setBoard(solution);
     } catch (error) {
-      Alert.alert('Error', 'Failed to solve the Sudoku puzzle. Please try again.');
+      console.error('Error solving Sudoku:', error);
     }
   };
 
@@ -56,10 +53,10 @@ const SudokuBoard = () => {
                 key={`${rowIndex}-${colIndex}`}
                 style={[
                   styles.cell,
-                  ((rowIndex + 1) % 3 === 0 && rowIndex !== 8) && styles.bottomBorder,
                   ((colIndex + 1) % 3 === 0 && colIndex !== 8) && styles.rightBorder,
+                  ((rowIndex + 1) % 3 === 0 && rowIndex !== 8) && styles.bottomBorder,
                 ]}
-                value={cell.toString()}
+                value={cell}
                 onChangeText={(value) => handleCellChange(rowIndex, colIndex, value)}
                 keyboardType="numeric"
                 maxLength={1}
@@ -72,7 +69,7 @@ const SudokuBoard = () => {
         <TouchableOpacity style={styles.button} onPress={solveSudoku}>
           <Text style={styles.buttonText}>Solve</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.clearButton]} onPress={clearBoard}>
+        <TouchableOpacity style={styles.button} onPress={clearBoard}>
           <Text style={styles.buttonText}>Clear</Text>
         </TouchableOpacity>
       </View>
@@ -85,11 +82,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    backgroundColor: '#282c34',
   },
   board: {
     borderWidth: 2,
-    borderColor: '#000',
+    borderColor: '#8a8d94',
   },
   row: {
     flexDirection: 'row',
@@ -97,16 +94,17 @@ const styles = StyleSheet.create({
   cell: {
     width: 40,
     height: 40,
-    borderWidth: 0.5,
-    borderColor: '#999',
+    borderWidth: 1,
+    borderColor: '#8a8d94',
     textAlign: 'center',
-    fontSize: 20,
-  },
-  bottomBorder: {
-    borderBottomWidth: 2,
+    color: '#FFFFFF',
+    backgroundColor: '#353a45',
   },
   rightBorder: {
     borderRightWidth: 2,
+  },
+  bottomBorder: {
+    borderBottomWidth: 2,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -114,16 +112,13 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   button: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    borderRadius: 8,
-  },
-  clearButton: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: '#4a90e2',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 5,
   },
   buttonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
   },

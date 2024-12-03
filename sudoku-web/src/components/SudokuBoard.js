@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import './SudokuBoard.css';
 
 const SudokuBoard = () => {
   const [board, setBoard] = useState(Array(9).fill().map(() => Array(9).fill('')));
+  const fileInputRef = useRef(null);
 
   const handleCellChange = (row, col, value) => {
     // Only allow numbers 1-9 or empty string

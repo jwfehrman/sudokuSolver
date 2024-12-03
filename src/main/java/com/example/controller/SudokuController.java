@@ -9,18 +9,21 @@ import org.springframework.http.ResponseEntity;
 @RequestMapping("/api/sudoku")
 @CrossOrigin(origins = "http://localhost:3000")
 public class SudokuController {
+    
+    private final SudokuService sudokuService;
 
-    @Autowired
-    private SudokuService sudokuService;
+    public SudokuController(SudokuService sudokuService) {
+        this.sudokuService = sudokuService;
+    }
 
     @PostMapping("/solve")
-    public ResponseEntity<SudokuResponse> solve(@RequestBody SudokuRequest request) {
-        String[][] solvedBoard = sudokuService.solve(request.getBoard());
-        if (solvedBoard != null) {
-            SudokuResponse response = new SudokuResponse(solvedBoard);
-            return ResponseEntity.ok(response);
+    public ResponseEntity<SudokuResponse> solveSudoku(@RequestBody SudokuRequest request) {
+        try {
+            String[][] solvedBoard = sudokuService.solve(request.getBoard());
+            return ResponseEntity.ok(new SudokuResponse(solvedBoard));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new SudokuResponse(null));
         }
-        return ResponseEntity.badRequest().body(new SudokuResponse(null));
     }
 }
 
